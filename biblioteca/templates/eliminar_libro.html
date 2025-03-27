@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Eliminar libro: {{ book.titulo }}
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        <h2>Esta seguro de eliminar: {{ book.titulo }}?</h2>
+        <div class="col-md-8 col-md-offset-2">
+            <div class="form-group mt-4">
+                <a class="btn btn-primary" href="{% url 'biblioteca:index' %}">Cancelar</a>
+                <button class="btn btn-danger" type="submit">Eliminar</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

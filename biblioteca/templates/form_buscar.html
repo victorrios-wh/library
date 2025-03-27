@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if query %}
+        Resultados de busqueda
+    {% else %}
+        Buscar libro
+    {% endif%}
+{% endblock %}
+
+{% block content %}
+
+    {% if errors %}
+        {% for error in errors %}
+            <h5 class="text-danger">{{ error }}</h5>
+        {% endfor %}
+    {% endif %}
+    <form class="d-flex" role="search" method="get">
+        <input class="form-control me-2" type="search" placeholder="Titulo" aria-label="Search" name="q">
+        <button class="btn btn-outline-success" type="submit">Buscar</button>
+    </form>
+
+    {% if books %}
+        <h2>Estas buscando: <strong>{{ query }}</strong></h2>
+        {% include 'snippets/list_books.html' %}
+    {% else %}
+        {% if query %}
+            <h3 class="mt-4">No se encontraron libros con titulos parecidos a: <strong>{{ query }}</strong></h3>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

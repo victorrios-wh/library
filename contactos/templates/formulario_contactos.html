@@ -1,0 +1,48 @@
+<style type="text/css">
+    ul.errorlist {
+        margin: 0;
+        padding: 0;
+    }
+
+    .errorlist li {
+        background-color: red;
+        color: white;
+        display: block;
+        font-size: 10px;
+        margin: 0 0 3px;
+        padding: 4px 5px;
+    }
+
+</style>
+
+<html>
+    <head>
+        <title>Contactos</title>
+    </head>
+    <body>
+        <h1>Contactanos</h1>
+        {% if form.errors %}
+            <li style="color: red;">Por favor corrige lo siguiente:</li>    
+        {% endif %}
+        <form action="" method="post">
+            {% csrf_token %}
+            
+            <div class="field">
+                {{ form.asunto.errors }}
+                <label for="id_asunto">Asunto:</label>
+                {{ form.asunto }}
+            </div>
+            <div class="field">
+                {{ form.email.errors }}
+                <label for="id_email">E-mail:</label>
+                {{ form.email }}
+            </div>
+            <div class="field">
+                {{ form.mensaje.errors }}
+                <label for="id_mensaje">Mensaje:</label>
+                {{ form.mensaje }}
+            </div>
+            <input type="submit" value="Enviar">
+        </form>
+    </body>
+</html>
