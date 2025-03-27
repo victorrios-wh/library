@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Lista de libros
+{% endblock %}
+
+{% block content %}
+
+    {% if books %}
+        {% include 'snippets/list_books.html' %}
+    {% else %}
+        <h1>Por el momento no hay libros</h1>
+    {% endif %}
+
+{% endblock %}

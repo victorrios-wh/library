@@ -1,0 +1,25 @@
+<p>Libros encontrados: {{ books|length }} libro{{ books|pluralize }}.</p>
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Titulo</th>
+            <th scope="col">Editor</th>
+            <th scope="col">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+            <tr>
+                <th scope="row">{{ book.id }}</th>
+                <td>{{ book.titulo }}</td>
+                <td>{{ book.editor }}</td>
+                <td>
+                    <a class="btn btn-primary" href="{% url 'biblioteca:editar_libro' book.id %}">Editar</a>
+                    <a class="btn btn-danger" href="{% url 'biblioteca:eliminar_libro' book.id %}">Eliminar</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
