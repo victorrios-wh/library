@@ -8,6 +8,6 @@ urlpatterns = [
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', index),
+    url(r'^$', index, name='home'),
     url(r'^biblioteca/', include('biblioteca.urls', namespace='biblioteca')),
 ]

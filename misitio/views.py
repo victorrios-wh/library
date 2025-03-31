@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+from django.shortcuts import render
 
 def index(request):
-    return redirect('biblioteca:index')
+    return render(request, 'base.html', {})
