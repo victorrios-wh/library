@@ -16,8 +16,8 @@
                 <td>{{ book.titulo }}</td>
                 <td>{{ book.editor }}</td>
                 <td>
-                    <a class="btn btn-primary" href="{% url 'biblioteca:editar_libro' book.id %}">Editar</a>
-                    <a class="btn btn-danger" href="{% url 'biblioteca:eliminar_libro' book.id %}">Eliminar</a>
+                    <a class="btn btn-primary" href="{% if origin == 'func' %}{% url 'biblioteca:editar_libro_func' book.id %}{% else %}{% url 'biblioteca:editar_libro_cbv' book.id %}{% endif %}">Editar</a>
+                    <a class="btn btn-danger" href="{% if origin == 'func' %}{% url 'biblioteca:eliminar_libro_func' book.id %}{% else %}{% url 'biblioteca:eliminar_libro_cbv' book.id %}{% endif %}">Eliminar</a>
                 </td>
             </tr>
         {% endfor %}

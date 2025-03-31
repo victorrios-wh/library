@@ -10,7 +10,7 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
-        <a class="navbar-brand" href="{% url 'biblioteca:index' %}">Biblioteca</a>
+        <a class="navbar-brand" href="{% url 'home' %}">Biblioteca</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -24,8 +24,19 @@
                 Libros
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="{% url 'biblioteca:registrar_libro' %}">Registrar</a></li>
-                <li><a class="dropdown-item" href="{% url 'biblioteca:buscar_libro' %}">Buscar</a></li>
+                <li><a class="dropdown-item" href="{% url 'biblioteca:index_func' %}">Listar</a></li>
+                <li><a class="dropdown-item" href="{% url 'biblioteca:registrar_libro_func' %}">Registrar</a></li>
+                <li><a class="dropdown-item" href="{% url 'biblioteca:buscar_libro_func' %}">Buscar</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Libros CBV
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
+                <li><a class="dropdown-item" href="{% url 'biblioteca:index_cbv' %}">Listar</a></li>
+                <li><a class="dropdown-item" href="{% url 'biblioteca:registrar_libro_cbv' %}">Registrar</a></li>
+                <li><a class="dropdown-item" href="{% url 'biblioteca:buscar_libro_cbv' %}">Buscar</a></li>
               </ul>
             </li>
           </ul>
@@ -33,11 +44,17 @@
       </div>
     </nav>
 
+    <div class="container">
+      {% include 'messages.html' %}
+    </div>
+
     <div class="container my-5">
         {% block content %}
         {% endblock %}
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <!-- <script src="main.js"></script> -->
   </body>

@@ -1,7 +1,9 @@
-from django.http import HttpResponse
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Q
 from biblioteca.models import Libro
 from biblioteca.forms import LibroForm
 
@@ -11,7 +13,12 @@ class RegisterBook(CreateView):
     model = Libro
     form_class = LibroForm
     template_name = 'form_libro.html'
-    success_url = reverse_lazy('biblioteca:index')
+    success_url = reverse_lazy('biblioteca:index_cbv')
+
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Libro registrado exitosamente')
+        return super().form_valid(form)
 
 class ListBooks(ListView):
     model = Libro
@@ -19,6 +26,7 @@ class ListBooks(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['origin'] = 'cbv'
         context['books'] = context['object_list']
         return context
 
@@ -26,30 +34,75 @@ class EditBook(UpdateView):
     model = Libro
     form_class = LibroForm
     template_name = 'form_libro.html'
-    success_url = reverse_lazy('biblioteca:index')
+    success_url = reverse_lazy('biblioteca:index_cbv')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['book'] = context['object']
         return context
 
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Libro editado exitosamente')
+        return super().form_valid(form)
+
 class DeleteBook(DeleteView):
     model = Libro
     template_name = 'eliminar_libro.html'
-    success_url = reverse_lazy('biblioteca:index')
+    success_url = reverse_lazy('biblioteca:index_cbv')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['origin'] = 'cbv'
         context['book'] = context['object']
+        return context
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+        messages.success(self.request, 'Libro eliminado exitosamente')
+        return HttpResponseRedirect(success_url)
+
+class SearchBook(ListView):
+    template_name = 'form_buscar.html'
+    errors = []
+    q = ''
+
+    def get_queryset(self):
+        print("obtengo datos de q")
+        self.errors = []
+        if 'q' in self.request.GET:
+            q = self.request.GET.get('q','')
+            if not q:
+                self.errors.append('Por favor introduce un termino de busqueda')
+            elif len(q) > 20:
+                self.errors.append('Por favor introduce un termino de busqueda menor a 20 caracteres')
+            else:
+                return Libro.objects.filter(titulo__icontains=self.query())
+    
+    def query(self):
+        print("envio valor de q")
+        self.q = self.request.GET.get('q')
+        return self.q
+    
+    def get_context_data(self, **kwargs):
+        print("devuelvo contexto")
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.q
+        context['origin'] = 'cbv'
+        context['books'] = context['object_list']
+        context['errors'] = self.errors
         return context
 
 def register_book(request):
 
     if request.method == 'POST':
-        form = LibroForm(request.POST)
+        form = LibroForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('biblioteca:index')
+            messages.success(request, 'Libro registrado exitosamente')
+            return redirect('biblioteca:index_func')
     else:
         form = LibroForm()
 
@@ -62,6 +115,7 @@ def list_books(request):
     books = Libro.objects.all()
 
     return render(request, 'listar_libros.html', {
+        'origin': 'func',
         'books': books
     })
 
@@ -72,12 +126,13 @@ def edit_book(request, id):
         if request.method == 'GET':
             form = LibroForm(instance=libro)
         else:
-            form = LibroForm(request.POST, instance=libro)
+            form = LibroForm(request.POST, request.FILES, instance=libro)
             if form.is_valid():
                 form.save()
-                return redirect('biblioteca:index')
+                messages.success(request, 'Libro editado exitosamente')
+                return redirect('biblioteca:index_func')
     else:
-        return redirect('biblioteca:index')
+        return redirect('biblioteca:index_func')
     
     return render(request, 'form_libro.html', {
         'title': 'Editar libro: {}'.format(libro.titulo),
@@ -90,11 +145,13 @@ def delete_book(request, id):
     if book:
         if request.method == 'POST':
             book.delete()
-            return redirect('biblioteca:index')
+            messages.success(request, 'Libro eliminado exitosamente')
+            return redirect('biblioteca:index_func')
     else:
-        return redirect('biblioteca:index')
+        return redirect('biblioteca:index_func')
     
     return render(request, 'eliminar_libro.html', {
+        'origin': 'func',
         'book': book
     })
 
@@ -110,31 +167,11 @@ def search_book(request):
             books = Libro.objects.filter(titulo__icontains=q)
             return render(request, 'form_buscar.html', {
                 'query': q,
+                'origin': 'func',
                 'books': books
             })
         
     return render(request, 'form_buscar.html', {
+        'origin': 'func',
         'errors': errors
     })
-
-# def buscar(request):
-#     errors = []
-#     contexto = {}
-#     if 'q' in request.GET:
-#         q = request.GET['q']
-#         if not q:
-#             errors.append('Por favor introduce un termino de busqueda')
-#         elif len(q) > 20:
-#             errors.append('Por favor introduce un termino de busqueda menor a 20 caracteres')
-#         else:
-#             libros = Libro.objects.filter(titulo__icontains=q)
-#             contexto.update({
-#                 'libros':libros,
-#                 'query': q
-#             })
-#             return render(request, 'listar_libros.html', contexto)
-    
-#     contexto.update({
-#         'errors': errors
-#     })
-#     return  render(request, 'formulario_buscar.html', contexto)
