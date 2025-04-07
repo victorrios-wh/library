@@ -5,7 +5,7 @@ from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import Q
 from biblioteca.models import Libro
-from biblioteca.forms import LibroForm
+from biblioteca.forms import LibroForm, DivErrorList
 
 # Create your views here.
 
@@ -19,6 +19,22 @@ class RegisterBook(CreateView):
         self.object = form.save()
         messages.success(self.request, 'Libro registrado exitosamente')
         return super().form_valid(form)
+    
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = {
+            "initial": self.get_initial(),
+            "prefix": self.get_prefix(),
+        }
+        if self.request.method in ("POST", "PUT"):
+            kwargs.update(
+                {
+                    "data": self.request.POST,
+                    "files": self.request.FILES,
+                    "error_class": DivErrorList
+                }
+            )
+        return kwargs
 
 class ListBooks(ListView):
     model = Libro
@@ -45,6 +61,19 @@ class EditBook(UpdateView):
         self.object = form.save()
         messages.success(self.request, 'Libro editado exitosamente')
         return super().form_valid(form)
+    
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = super().get_form_kwargs()
+        if hasattr(self, "object"):
+            kwargs.update({"instance": self.object})
+        if self.request.method in ("POST", "PUT"):
+            kwargs.update(
+                {
+                    "error_class": DivErrorList
+                }
+            )
+        return kwargs
 
 class DeleteBook(DeleteView):
     model = Libro
@@ -70,7 +99,6 @@ class SearchBook(ListView):
     q = ''
 
     def get_queryset(self):
-        print("obtengo datos de q")
         self.errors = []
         if 'q' in self.request.GET:
             q = self.request.GET.get('q','')
@@ -82,12 +110,10 @@ class SearchBook(ListView):
                 return Libro.objects.filter(titulo__icontains=self.query())
     
     def query(self):
-        print("envio valor de q")
         self.q = self.request.GET.get('q')
         return self.q
     
     def get_context_data(self, **kwargs):
-        print("devuelvo contexto")
         context = super().get_context_data(**kwargs)
         context['query'] = self.q
         context['origin'] = 'cbv'
@@ -98,7 +124,7 @@ class SearchBook(ListView):
 def register_book(request):
 
     if request.method == 'POST':
-        form = LibroForm(request.POST, request.FILES)
+        form = LibroForm(request.POST, request.FILES, error_class=DivErrorList)
         if form.is_valid():
             form.save()
             messages.success(request, 'Libro registrado exitosamente')
@@ -126,7 +152,7 @@ def edit_book(request, id):
         if request.method == 'GET':
             form = LibroForm(instance=libro)
         else:
-            form = LibroForm(request.POST, request.FILES, instance=libro)
+            form = LibroForm(request.POST, request.FILES, instance=libro, error_class=DivErrorList)
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Libro editado exitosamente')

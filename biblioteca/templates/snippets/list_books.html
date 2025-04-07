@@ -4,6 +4,7 @@
     <thead>
         <tr>
             <th scope="col">#</th>
+            <th scope="col">Portada</th>
             <th scope="col">Titulo</th>
             <th scope="col">Editor</th>
             <th scope="col">Acciones</th>
@@ -13,6 +14,11 @@
         {% for book in books %}
             <tr>
                 <th scope="row">{{ book.id }}</th>
+                <td>
+                    {% if book.portada %}
+                        <img src="{{ book.portada.url }}" alt="Portada de libro" width="72" height="72">
+                    {% endif %}
+                </td>
                 <td>{{ book.titulo }}</td>
                 <td>{{ book.editor }}</td>
                 <td>
